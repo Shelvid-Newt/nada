@@ -185,6 +185,10 @@
                   <template #prepend><v-icon size="small" color="primary">mdi-pencil</v-icon></template>
                   <v-list-item-title class="text-caption">{{ t('edit') }}</v-list-item-title>
                 </v-list-item>
+                <v-list-item v-if="canDuplicate(study)" @click="openDuplicate(study)">
+                  <template #prepend><v-icon size="small" color="primary">mdi-content-copy</v-icon></template>
+                  <v-list-item-title class="text-caption">{{ t('duplicate_study', 'Duplicate') }}</v-list-item-title>
+                </v-list-item>
                 <v-list-item :href="transferOwnershipUrl(study)">
                   <template #prepend><v-icon size="small" color="primary">mdi-transfer-right</v-icon></template>
                   <v-list-item-title class="text-caption">{{ t('transfer_ownership') }}</v-list-item-title>
@@ -229,6 +233,12 @@
       </v-row>
     </div>
 
+    <DuplicateStudyDialog
+      v-model="duplicateOpen"
+      :study="duplicateTarget"
+      @created="onDuplicated"
+    />
+
     <Teleport to="body">
       <v-dialog
         v-model="batchProcessing"
@@ -252,6 +262,7 @@ import { useAppConfig } from '@/shared/composables/useAppConfig';
 import { useCatalogApi } from '../composables/useCatalogApi';
 import { useI18n } from '@/shared/composables/useI18n';
 import $dialog from '@/shared/composables/dialog';
+import DuplicateStudyDialog from './DuplicateStudyDialog.vue';
 
 defineOptions({ name: 'AdminCatalogResults' });
 
@@ -271,6 +282,25 @@ const { siteUrl, baseUrl } = useAppConfig();
 const { updateOptions, deleteStudy } = useCatalogApi();
 const selected = ref([]);
 const publishLoading = ref(null);
+const duplicateOpen = ref(false);
+const duplicateTarget = ref(null);
+
+/** Study types the server can duplicate (time series and tables keep their values outside the catalog). */
+const DUPLICABLE_TYPES = ['survey', 'document', 'script', 'image', 'video', 'geospatial'];
+
+function canDuplicate(study) {
+  return DUPLICABLE_TYPES.includes(study?.type);
+}
+
+function openDuplicate(study) {
+  duplicateTarget.value = study;
+  duplicateOpen.value = true;
+}
+
+function onDuplicated() {
+  emit('refresh');
+}
+
 /** Shown while batch publish / unpublish / delete requests run after confirmation. */
 const batchProcessing = ref(false);
 

@@ -188,6 +188,7 @@ $route['api/admin/catalog/(:any)/aliases_delete']       = 'api/admin/catalog/ali
 $route['api/admin/catalog/(:any)/aliases']              = 'api/admin/catalog/aliases/$1';
 $route['api/admin/catalog/(:any)/collections'] = 'api/admin/catalog/collections/$1';
 $route['api/admin/catalog/(:any)/doi']         = 'api/admin/catalog/doi/$1';
+$route['api/admin/catalog/(:any)/duplicate']   = 'api/admin/catalog/duplicate/$1';
 $route['api/admin/catalog/(:any)/package']     = 'api/admin/catalog/package/$1';
 $route['api/admin/catalog/(:any)/thumbnail'] = 'api/admin/catalog/thumbnail/$1';
 $route['api/admin/catalog/(:any)/tags/delete'] = 'api/admin/catalog/tags_delete/$1';

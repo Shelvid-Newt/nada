@@ -262,5 +262,37 @@ $lang['confirm_set_study_status']='Set this study to %s?';
 $lang['search_placeholder']='Search %s...';
 
 
+// Duplicate study
+$lang['duplicate_study']="Duplicate";
+$lang['duplicate_dialog_title']="Duplicate study";
+$lang['duplicate_dialog_intro']="Create a draft copy of \"%s\", then change only what differs.";
+$lang['duplicate_title_label']="Title of the copy";
+$lang['duplicate_title_suffix']="(copy)";
+$lang['duplicate_idno_label']="IDNO of the copy";
+$lang['duplicate_idno_hint']="Must be unique in the catalog.";
+$lang['duplicate_idno_checking']="Checking availability...";
+$lang['duplicate_idno_available']="This IDNO is available.";
+$lang['duplicate_idno_taken']="This IDNO is already used by another study.";
+$lang['duplicate_idno_required']="The IDNO is required.";
+$lang['duplicate_idno_too_long']="The IDNO is too long (200 characters maximum).";
+$lang['duplicate_scope_label']="What should be copied?";
+$lang['duplicate_scope_metadata_title']="Study description only";
+$lang['duplicate_scope_metadata_desc']="Metadata, tags and access type. The quickest option.";
+$lang['duplicate_scope_full_title']="Study description and data description";
+$lang['duplicate_scope_full_desc']="Also copies the %s data file(s) and %s variable(s), with their labels and categories.";
+$lang['duplicate_scope_full_unavailable']="This study has no data files or variables to copy.";
+$lang['duplicate_not_copied']="Not copied: DOI and alternate IDNOs, thumbnail, resources and files, citations and notes.";
+$lang['duplicate_draft_notice']="The copy is created as a draft in the same collection. It stays hidden from the public until you publish it.";
+$lang['duplicate_create']="Create copy";
+$lang['duplicate_creating']="Creating the copy... Large studies can take a moment.";
+$lang['duplicate_success_title']="Copy created";
+$lang['duplicate_success_message']="\"%s\" was created as a draft.";
+$lang['duplicate_edit_copy']="Edit the copy";
+$lang['duplicate_back_to_list']="Back to the list";
+$lang['duplicate_error_generic']="The copy could not be created.";
+$lang['duplicate_error_denied']="You do not have permission to duplicate this study.";
+$lang['duplicate_unsupported']="Duplication is not available for this type of study yet.";
+
+
 /* End of file catalog_admin_lang.php */
 /* Location: ./application/language/english/catalog_admin_lang.php */

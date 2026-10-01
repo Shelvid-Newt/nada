@@ -84,6 +84,73 @@ export function useCatalogApi() {
   }
 
   /**
+   * What the duplicate dialog needs (suggested IDNO/title, data description counts).
+   * GET api/admin/catalog/{id}/duplicate?id_format=id
+   * @param {number|string} id - study id (surveys.id)
+   */
+  async function fetchDuplicateInfo(id) {
+    if (id == null || id === '') throw new Error('id required');
+    const base = apiBaseUrl.value || '';
+    const { data } = await axios.get(`${base}${encodeURIComponent(String(id))}/duplicate`, {
+      params: { id_format: 'id' },
+      withCredentials: true,
+    });
+    if (data.status !== 'success') throw new Error(data.message || 'Duplicate info failed');
+    return data.result;
+  }
+
+  /**
+   * Create a draft copy of a study.
+   * POST api/admin/catalog/{id}/duplicate?id_format=id
+   * @param {number|string} id - source study id (surveys.id)
+   * @param {Object} payload - { new_idno, new_title, include_data_description }
+   * @returns {Promise<Object>} API response (sid, idno, dataset, data_description, _links)
+   * @throws {Error} with `.code` set to the API message (e.g. IDNO_ALREADY_EXISTS, ACCESS_DENIED)
+   */
+  async function duplicateStudy(id, payload) {
+    if (id == null || id === '') throw new Error('id required');
+    const base = apiBaseUrl.value || '';
+    try {
+      const { data } = await axios.post(`${base}${encodeURIComponent(String(id))}/duplicate`, payload, {
+        params: { id_format: 'id' },
+        withCredentials: true,
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (data.status !== 'success') throw new Error(data.message || 'Duplicate failed');
+      return data;
+    } catch (e) {
+      const apiMessage = e?.response?.data?.message;
+      if (apiMessage) {
+        const err = new Error(apiMessage);
+        err.code = apiMessage;
+        throw err;
+      }
+      throw e;
+    }
+  }
+
+  /**
+   * Is this IDNO free? GET api/admin/catalog/check_idno/{idno} answers 200 when used, 404 when free.
+   * @param {string} idno
+   * @param {AbortSignal} [signal]
+   * @returns {Promise<'available'|'taken'|'unknown'>} 'unknown' when the check could not be made
+   */
+  async function checkIdnoAvailability(idno, signal) {
+    const base = apiBaseUrl.value || '';
+    try {
+      const { status } = await axios.get(`${base}check_idno/${encodeURIComponent(idno)}`, {
+        withCredentials: true,
+        signal,
+        validateStatus: (s) => s === 200 || s === 404,
+      });
+      return status === 404 ? 'available' : 'taken';
+    } catch (e) {
+      if (axios.isCancel(e)) throw e;
+      return 'unknown';
+    }
+  }
+
+  /**
    * @param {Object} params
    * @param {string} [params.owner_repo]
    * @param {number} [params.page]
@@ -191,6 +258,9 @@ export function useCatalogApi() {
     fetchFilterOptions,
     updateOptions,
     deleteStudy,
+    fetchDuplicateInfo,
+    duplicateStudy,
+    checkIdnoAvailability,
     fetchBatchStudiesPage,
     fetchAllBatchStudies,
     fetchBatchImportFiles,

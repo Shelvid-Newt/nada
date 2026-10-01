@@ -258,5 +258,37 @@ $lang['confirm_set_study_status']="Définir le statut de cette étude sur %s ?";
 $lang['search_placeholder']="Rechercher %s...";
 
 
+// Dupliquer une enquête
+$lang['duplicate_study']="Dupliquer";
+$lang['duplicate_dialog_title']="Dupliquer l'enquête";
+$lang['duplicate_dialog_intro']="Créer une copie brouillon de « %s », puis modifier uniquement ce qui diffère.";
+$lang['duplicate_title_label']="Titre de la copie";
+$lang['duplicate_title_suffix']="(copie)";
+$lang['duplicate_idno_label']="IDNO de la copie";
+$lang['duplicate_idno_hint']="Doit être unique dans le catalogue.";
+$lang['duplicate_idno_checking']="Vérification de la disponibilité...";
+$lang['duplicate_idno_available']="Cet IDNO est disponible.";
+$lang['duplicate_idno_taken']="Cet IDNO est déjà utilisé par une autre enquête.";
+$lang['duplicate_idno_required']="L'IDNO est obligatoire.";
+$lang['duplicate_idno_too_long']="L'IDNO est trop long (200 caractères maximum).";
+$lang['duplicate_scope_label']="Que faut-il copier ?";
+$lang['duplicate_scope_metadata_title']="Description de l'enquête uniquement";
+$lang['duplicate_scope_metadata_desc']="Métadonnées, mots-clés et type d'accès. L'option la plus rapide.";
+$lang['duplicate_scope_full_title']="Description de l'enquête et des données";
+$lang['duplicate_scope_full_desc']="Copie aussi les %s fichier(s) de données et les %s variable(s), avec leurs libellés et modalités.";
+$lang['duplicate_scope_full_unavailable']="Cette enquête n'a ni fichier de données ni variable à copier.";
+$lang['duplicate_not_copied']="Non copiés : DOI et IDNO alternatifs, vignette, ressources et fichiers, citations et notes.";
+$lang['duplicate_draft_notice']="La copie est créée en brouillon dans la même collection. Elle reste invisible du public jusqu'à sa publication.";
+$lang['duplicate_create']="Créer la copie";
+$lang['duplicate_creating']="Création de la copie... Les grandes enquêtes peuvent prendre un moment.";
+$lang['duplicate_success_title']="Copie créée";
+$lang['duplicate_success_message']="« %s » a été créée en brouillon.";
+$lang['duplicate_edit_copy']="Modifier la copie";
+$lang['duplicate_back_to_list']="Retour à la liste";
+$lang['duplicate_error_generic']="La copie n'a pas pu être créée.";
+$lang['duplicate_error_denied']="Vous n'avez pas la permission de dupliquer cette enquête.";
+$lang['duplicate_unsupported']="La duplication n'est pas encore disponible pour ce type d'enquête.";
+
+
 /* End of file catalog_admin */
 /* Location: ./application/language/french/catalog_admin */

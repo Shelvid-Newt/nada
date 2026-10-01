@@ -1701,6 +1701,125 @@ class Catalog extends MY_REST_Controller
 
 
 	/**
+	 * What the "Duplicate study" dialog needs: supported or not, suggested IDNO and title,
+	 * and what the optional data description (data files, variables) contains.
+	 *
+	 * GET /api/admin/catalog/{idno}/duplicate — optional query `id_format=id`.
+	 */
+	function duplicate_get($idno = null)
+	{
+		try {
+			$sid = $this->get_sid_from_idno($idno);
+			$this->has_dataset_access('view', $sid);
+
+			$this->lang->load('catalog_admin');
+			$this->load->library('Catalog_dataset_duplicate');
+
+			$this->set_response(
+				array(
+					'status' => 'success',
+					'result' => $this->catalog_dataset_duplicate->get_info($sid, t('duplicate_title_suffix')),
+				),
+				REST_Controller::HTTP_OK
+			);
+		}
+		catch (AclAccessDeniedException $e) {
+			unset($e);
+			$this->set_response(array('status' => 'failed', 'message' => 'ACCESS_DENIED'), REST_Controller::HTTP_FORBIDDEN);
+		}
+		catch (Exception $e) {
+			$this->set_response(
+				array(
+					'status'  => 'failed',
+					'message' => $e->getMessage(),
+				),
+				REST_Controller::HTTP_BAD_REQUEST
+			);
+		}
+	}
+
+
+	/**
+	 * Duplicate a study. The copy is always created as a draft, in the same collection.
+	 *
+	 * POST /api/admin/catalog/{idno}/duplicate — optional query `id_format=id`.
+	 * JSON body (all optional):
+	 *   new_idno                  IDNO of the copy (default: first free "{idno}-copy[-n]")
+	 *   new_title                 title of the copy (default: same as the source)
+	 *   include_data_description  true to also copy data files, variables and variable groups
+	 */
+	function duplicate_post($idno = null)
+	{
+		try {
+			$sid = $this->get_sid_from_idno($idno);
+			$this->has_dataset_access('view', $sid);
+
+			$source = $this->dataset_manager->get_row($sid);
+			if (! $source) {
+				throw new Exception('IDNO-NOT-FOUND');
+			}
+
+			// same permission as creating a study in the collection the copy will live in
+			$this->has_dataset_access('edit', null, ! empty($source['repositoryid']) ? $source['repositoryid'] : 'central');
+
+			$input = $this->raw_json_input();
+			if (! is_array($input)) {
+				$input = array();
+			}
+
+			$this->load->library('Catalog_dataset_duplicate');
+			$created = $this->catalog_dataset_duplicate->duplicate(
+				$sid,
+				array(
+					'new_idno'                 => isset($input['new_idno']) ? $input['new_idno'] : null,
+					'new_title'                => isset($input['new_title']) ? $input['new_title'] : null,
+					'include_data_description' => ! empty($input['include_data_description']),
+					'user_id'                  => $this->get_api_user_id(),
+				)
+			);
+
+			$this->set_response(
+				array(
+					'status'           => 'success',
+					'dataset'          => $created['dataset'],
+					'sid'              => $created['sid'],
+					'idno'             => $created['idno'],
+					'data_description' => $created['data_description'],
+					'_links'           => array(
+						'view' => site_url('catalog/' . $created['sid']),
+						'edit' => site_url('admin/catalog/edit/' . $created['sid']),
+					),
+				),
+				REST_Controller::HTTP_CREATED
+			);
+		}
+		catch (AclAccessDeniedException $e) {
+			unset($e);
+			$this->set_response(array('status' => 'failed', 'message' => 'ACCESS_DENIED'), REST_Controller::HTTP_FORBIDDEN);
+		}
+		catch (ValidationException $e) {
+			$this->set_response(
+				array(
+					'status'  => 'failed',
+					'message' => $e->getMessage(),
+					'errors'  => (array) $e->GetValidationErrors(),
+				),
+				REST_Controller::HTTP_BAD_REQUEST
+			);
+		}
+		catch (Exception $e) {
+			$this->set_response(
+				array(
+					'status'  => 'failed',
+					'message' => $e->getMessage(),
+				),
+				$e->getMessage() === 'IDNO_ALREADY_EXISTS' ? REST_Controller::HTTP_CONFLICT : REST_Controller::HTTP_BAD_REQUEST
+			);
+		}
+	}
+
+
+	/**
 	 * Replace study IDNO (same contract as POST api/datasets/replace_idno).
 	 *
 	 * POST /api/admin/catalog/replace_idno — JSON `{ "old_idno": "…", "new_idno": "…" }`.
